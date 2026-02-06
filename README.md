@@ -31,7 +31,7 @@ Customer churn is a critical business problem — acquiring new customers costs 
 ![Churn Prediction](images/churn_confirm.png)
 
 ### No Churn Prediction (Low Risk)
-![No Churn Prediction](dimages/no_churn.png)
+![No Churn Prediction](images/no_churn.png)
 
 ### Cloud Monitoring (GCP)
 ![GCP Monitoring](images/api_monitoring.png)
