@@ -1,131 +1,292 @@
-# Customer Churn Prediction API
+# 🛒 E-Commerce Customer Churn Prediction
 
-A Flask-based REST API for predicting customer churn, deployed on Google Cloud Platform.
+A production-ready machine learning system that predicts customer churn for e-commerce businesses. Built with XGBoost, Flask API, Streamlit dashboard, and deployed on Google Cloud Run.
 
-## Overview
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![XGBoost](https://img.shields.io/badge/XGBoost-2.0-orange)
+![Flask](https://img.shields.io/badge/Flask-3.0-green)
+![GCP](https://img.shields.io/badge/GCP-Cloud%20Run-blue)
 
-This project demonstrates MLOps practices by building and deploying a machine learning model that predicts whether a telecom customer will churn (leave the company) based on their account information.
+## 🎯 Project Overview
 
-**Model:** Random Forest Classifier  
-**Dataset:** [Telco Customer Churn Dataset](https://github.com/IBM/telco-customer-churn-on-icp4d)
+Customer churn is a critical business problem — acquiring new customers costs 5-25x more than retaining existing ones. This project provides:
 
-## Features Used
+- **ML Model**: XGBoost classifier with 92% accuracy
+- **REST API**: Flask-based API deployed on GCP Cloud Run
+- **Dashboard**: Interactive Streamlit interface for business users
+- **Recommendations**: Automated retention strategy suggestions
 
-| Feature | Description |
-|---------|-------------|
-| `tenure` | Number of months with the company |
-| `monthly_charges` | Monthly bill amount |
-| `total_charges` | Total amount charged |
-| `contract` | Contract type (Month-to-month, One year, Two year) |
-| `internet_service` | Internet service type (DSL, Fiber optic, No) |
-| `payment_method` | Payment method |
+### 🔗 Live Demo
 
-## Project Structure
+- **API**: https://ecommerce-churn-app-957487780317.us-central1.run.app
+- **Health Check**: https://ecommerce-churn-app-957487780317.us-central1.run.app/health
+
+---
+## 📸 Screenshots                   
+
+### Dashboard
+![Dashboard](dashimg/dashboard.png)
+
+### Churn Prediction (High Risk)
+![Churn Prediction](dashimg/churn_confirm.png)
+
+### No Churn Prediction (Low Risk)
+![No Churn Prediction](dashimg/no_churn.png)
+
+### Cloud Monitoring (GCP)
+![GCP Monitoring](dashimg/api_monitoring.png)
+
+
+## 📊 Model Performance
+
+| Metric | Score |
+|--------|-------|
+| Accuracy | 92% |
+| Precision | 88% |
+| Recall | 75% |
+| F1-Score | 81% |
+| ROC-AUC | 94% |
+
+---
+
+## 🔍 Key Findings
+
+| Risk Factor | Impact |
+|-------------|--------|
+| **Tenure < 6 months** | 3x higher churn risk |
+| **Has Complaints** | Strongest churn predictor |
+| **Satisfaction Score ≤ 2** | 2.5x higher churn risk |
+| **Inactive > 30 days** | High disengagement signal |
+| **Low Cashback** | Indicates low engagement |
+
+---
+
+## 🛠️ Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| ML Model | XGBoost, Scikit-learn |
+| Data Processing | Pandas, NumPy |
+| API | Flask |
+| Frontend | Streamlit |
+| Containerization | Docker |
+| Cloud | GCP Cloud Run, Cloud Build |
+| Version Control | Git, GitHub |
+
+---
+
+## 📁 Project Structure
 
 ```
+ecommerce-churn-prediction/
 ├── model/
-│   └── churn_model.pkl    # Trained model
-├── main.py                # Flask API
-├── predict.py             # Prediction module
-├── streamlit_app.py       # Frontend application
-├── train_model.py         # Model training script
-├── Dockerfile
-├── requirements.txt
+│   ├── churn_model.pkl          # Trained model + encoders
+│   ├── model_metadata.json      # Model performance metrics
+│   ├── model_comparison.csv     # All models comparison
+│   └── feature_importance.csv   # Feature rankings
+├── data/
+│   └── ecommerce_churn.csv      # Dataset (not in repo)
+├── train.py                     # Training pipeline
+├── predict.py                   # Prediction module
+├── main.py                      # Flask API
+├── streamlit_app.py             # Streamlit dashboard
+├── requirements.txt             # Dependencies
+├── Dockerfile                   # Container config
+├── .gitignore
 └── README.md
 ```
 
-## Setup & Installation
+---
 
-### 1. Install Dependencies
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.10+
+- Git
+
+### Local Development
+
 ```bash
+# Clone repository
+git clone https://github.com/kizamehoshigaki/ecommerce-churn-prediction.git
+cd ecommerce-churn-prediction
+
+# Install dependencies
 pip install -r requirements.txt
-```
 
-### 2. Train the Model
-```bash
-python train_model.py
-```
+# Download dataset from Kaggle and save to data/ecommerce_churn.csv
+# https://www.kaggle.com/datasets/ankitverma2010/ecommerce-customer-churn-analysis-and-prediction
 
-### 3. Run Locally
-```bash
+# Train the model
+python train.py
+
+# Run API
 python main.py
-```
-The API will be available at `http://localhost:8080`
 
-### 4. Run Streamlit Frontend
-```bash
+# Run Streamlit (new terminal)
 streamlit run streamlit_app.py
 ```
 
-## API Endpoints
+### Docker
 
-### Health Check
-```
-GET /health
-```
+```bash
+# Build image
+docker build -t ecommerce-churn-app .
 
-### Predict Churn
-```
-POST /predict
-Content-Type: application/json
-
-{
-    "tenure": 12,
-    "monthly_charges": 50.0,
-    "total_charges": 600.0,
-    "contract": "Month-to-month",
-    "internet_service": "Fiber optic",
-    "payment_method": "Electronic check"
-}
+# Run container
+docker run -p 8080:8080 ecommerce-churn-app
 ```
 
-**Response:**
+---
+
+## 📡 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | API documentation |
+| `/health` | GET | Health check |
+| `/predict` | POST | Predict churn |
+| `/model/info` | GET | Model metadata |
+| `/model/valid-values` | GET | Valid input values |
+
+### Example Request
+
+```bash
+curl -X POST https://ecommerce-churn-app-957487780317.us-central1.run.app/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tenure": 5,
+    "warehouse_to_home": 25,
+    "hour_spend_on_app": 2.0,
+    "number_of_device_registered": 3,
+    "satisfaction_score": 2,
+    "number_of_address": 4,
+    "complain": 1,
+    "order_amount_hike": 15,
+    "coupon_used": 1,
+    "order_count": 3,
+    "day_since_last_order": 15,
+    "cashback_amount": 120,
+    "city_tier": 1,
+    "preferred_login_device": "Mobile Phone",
+    "preferred_payment_mode": "Credit Card",
+    "gender": "Male",
+    "prefered_order_cat": "Mobile Phone",
+    "marital_status": "Single"
+  }'
+```
+
+### Example Response
+
 ```json
 {
-    "prediction": "Churn",
-    "churn_probability": 0.73,
-    "retention_probability": 0.27
+  "prediction": "Churn",
+  "churn_probability": 0.7342,
+  "retention_probability": 0.2658,
+  "risk_level": "High",
+  "risk_factors": [
+    "New customer (tenure: 5 months) - highest churn risk",
+    "Has filed complaints - strong churn indicator",
+    "Low satisfaction score (2/5)"
+  ],
+  "recommendations": [
+    "Implement onboarding program with early engagement incentives",
+    "Prioritize complaint resolution and follow-up within 24 hours",
+    "Offer personalized discount or loyalty reward"
+  ]
 }
 ```
 
-## GCP Deployment
+---
+
+## ☁️ GCP Deployment
 
 ### Prerequisites
-- [Google Cloud CLI](https://cloud.google.com/sdk/docs/install)
-- GCP Project with billing enabled
-- Artifact Registry and Cloud Build APIs enabled
+
+- Google Cloud account
+- gcloud CLI installed
+- Project with billing enabled
 
 ### Deploy Steps
 
-1. **Authenticate with GCP:**
 ```bash
-gcloud init
+# Authenticate
 gcloud auth login
+
+# Set project
+gcloud config set project YOUR_PROJECT_ID
+
+# Enable APIs
+gcloud services enable cloudbuild.googleapis.com run.googleapis.com
+
+# Build and push
+gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/ecommerce-churn-app
+
+# Deploy
+gcloud run deploy ecommerce-churn-app \
+  --image gcr.io/YOUR_PROJECT_ID/ecommerce-churn-app \
+  --platform managed \
+  --region us-central1 \
+  --port 8080 \
+  --allow-unauthenticated
 ```
 
-2. **Enable required APIs:**
-```bash
-gcloud services enable cloudbuild.googleapis.com
-gcloud services enable run.googleapis.com
-gcloud services enable artifactregistry.googleapis.com
-```
+---
 
-3. **Build and push container:**
-```bash
-gcloud builds submit --tag gcr.io/mlops-churn-lab/churn-app
-```
+## 📈 Features Used
 
-4. **Deploy to Cloud Run:**
-```bash
-gcloud run deploy churn-app --image gcr.io/mlops-churn-lab/churn-app --platform managed --port 8080 --allow-unauthenticated
-```
+### Numerical Features (13)
 
-5. **Update Streamlit app** with the deployed URL and run:
-```bash
-streamlit run streamlit_app.py
-```
+| Feature | Description |
+|---------|-------------|
+| Tenure | Months with company |
+| WarehouseToHome | Distance in km |
+| HourSpendOnApp | Daily app usage |
+| NumberOfDeviceRegistered | Registered devices |
+| SatisfactionScore | Rating 1-5 |
+| NumberOfAddress | Saved addresses |
+| Complain | Has complained (0/1) |
+| OrderAmountHikeFromlastYear | % increase |
+| CouponUsed | Coupons redeemed |
+| OrderCount | Total orders |
+| DaySinceLastOrder | Days inactive |
+| CashbackAmount | Total cashback |
+| CityTier | City tier (1/2/3) |
 
-## Author
+### Categorical Features (5)
 
-Aaditya - IE7374 MLOps Lab Assignment  
+| Feature | Values |
+|---------|--------|
+| PreferredLoginDevice | Mobile Phone, Computer, Phone |
+| PreferredPaymentMode | Credit Card, Debit Card, UPI, COD, E wallet |
+| Gender | Male, Female |
+| PreferedOrderCat | Laptop & Accessory, Mobile, Fashion, Grocery, Others |
+| MaritalStatus | Single, Married, Divorced |
+
+---
+
+## 🧠 Model Training Pipeline
+
+1. **Data Loading** → Kaggle E-Commerce Churn Dataset
+2. **Preprocessing** → Handle nulls, encode categoricals, stratified split
+3. **Model Comparison** → Logistic Regression, Random Forest, Gradient Boosting, XGBoost
+4. **Class Imbalance** → Handled with class_weight / scale_pos_weight
+5. **Hyperparameter Tuning** → GridSearchCV with 5-fold CV
+6. **Save Artifacts** → Model, encoders, metadata
+
+---
+
+## 👨‍💻 Author
+
+**Aaditya Krishna**  
+MS Data Analytics Engineering  
 Northeastern University
+
+- GitHub: [@kizamehoshigaki](https://github.com/kizamehoshigaki)
+- LinkedIn: [Aaditya Krishna](https://linkedin.com/in/aadityakrishna)
+
+---
+## 📄 License
+
+This is a personal project built to demonstrate end-to-end MLOps skills including model development, API deployment, and cloud infrastructure.
